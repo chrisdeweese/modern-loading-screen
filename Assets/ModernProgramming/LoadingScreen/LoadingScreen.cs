@@ -1,14 +1,13 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace ModernProgramming
+namespace ModernProgramming.LoadingScreen
 {
-    public class LoadingScreen : MonoBehaviour
+    public sealed class LoadingScreen : MonoBehaviour
     {
-        [Header("Scene Information")]
+        [Header("Scene Information")] 
         public int sceneIndexToLoad;
         
         [Header("Loading Screen")]
@@ -16,7 +15,7 @@ namespace ModernProgramming
         public Slider slider;
         public Text progressLabel;
         
-        private static string[] _percentStrings = {
+        private static readonly string[] PercentStrings = {
             "0%", "1%", "2%", "3%", "4%", "5%", "6%", "7%", "8%", "9%",
             "10%", "11%", "12%", "13%", "14%", "15%", "16%", "17%", "18%", "19%",
             "20%", "21%", "22%", "23%", "24%", "25%", "26%", "27%", "28%", "29%",
@@ -29,17 +28,28 @@ namespace ModernProgramming
             "90%", "91%", "92%", "93%", "94%", "95%", "96%", "97%", "98%", "99%",
             "100%"
         };
-        
+
+        private bool _isloadingScreenNotNull;
+        private bool _issliderNull;
+        private bool _isprogressLabelNotNull;
+
+        private void Awake()
+        {
+            _isprogressLabelNotNull = progressLabel != null;
+            _issliderNull = slider == null;
+            _isloadingScreenNotNull = loadingScreen != null;
+        }
+
         public void Start()
         {
             StartCoroutine(LoadAsynchronously(sceneIndexToLoad));
         }
 
-        IEnumerator LoadAsynchronously(int sceneIndex)
+        private IEnumerator LoadAsynchronously(int sceneIndex)
         {
-            if (loadingScreen != null) loadingScreen.SetActive(true);
+            if (_isloadingScreenNotNull) loadingScreen.SetActive(true);
             
-            if (slider == null)
+            if (_issliderNull)
             {
                 Debug.Log("Modern Loading Screen - ERROR Please assign a loading slider in the inspector!");
                 yield break;
@@ -52,7 +62,7 @@ namespace ModernProgramming
                 float progress = Mathf.Clamp01(operation.progress / 0.9f);
 
                 slider.value = progress;
-                if (progressLabel != null) progressLabel.text = _percentStrings[(int)(progress * 100f)];
+                if (_isprogressLabelNotNull) progressLabel.text = PercentStrings[(int) (progress * 100f)];
                 
                 yield return null;
             }
